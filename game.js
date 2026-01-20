@@ -41,7 +41,26 @@ const platforms = [
   { x: 1500, y: canvas.height - 220, w: 150, h: 20 }
 ];
 
-function update() {
+function update(// начало прыжка
+if (keys.jump && player.onGround) {
+  player.vy = JUMP_FORCE;
+  player.onGround = false;
+  isJumping = true;
+  jumpTime = 0;
+}
+
+// затяжной прыжок (пока держишь кнопку)
+if (keys.jump && isJumping) {
+  if (jumpTime < MAX_JUMP_TIME) {
+    player.vy += EXTRA_JUMP_FORCE;
+    jumpTime++;
+  }
+}
+
+// если кнопку отпустил — прыжок обрывается
+if (!keys.jump) {
+  isJumping = false;
+}) {
   if (keys.left) player.x -= 5;
   if (keys.right) player.x += 5;
 
