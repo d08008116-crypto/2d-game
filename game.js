@@ -12,7 +12,7 @@ window.addEventListener("resize", resize);
 // ===== INPUT =====
 const keys = { left: false, right: false, jump: false };
 
-// кнопки (телефон)
+// тач
 left.ontouchstart = () => keys.left = true;
 left.ontouchend   = () => keys.left = false;
 
@@ -22,7 +22,7 @@ right.ontouchend   = () => keys.right = false;
 jump.ontouchstart = () => keys.jump = true;
 jump.ontouchend   = () => keys.jump = false;
 
-// клавиатура (ПК)
+// клавиатура
 window.addEventListener("keydown", e => {
   if (e.key === "a" || e.key === "ArrowLeft") keys.left = true;
   if (e.key === "d" || e.key === "ArrowRight") keys.right = true;
@@ -38,7 +38,7 @@ window.addEventListener("keyup", e => {
 // ===== PLAYER =====
 const player = {
   x: 100,
-  y: 100,
+  y: 0,
   w: 40,
   h: 40,
   vy: 0,
@@ -51,8 +51,8 @@ const speed = 6;
 
 // затяжной прыжок
 const JUMP_POWER = -18;
-const EXTRA_JUMP_FORCE = -0.8;
-const MAX_JUMP_FRAMES = 12;
+const EXTRA_JUMP_FORCE = -0.7;
+const MAX_JUMP_FRAMES = 14;
 
 let isJumping = false;
 let jumpFrames = 0;
@@ -61,15 +61,15 @@ let jumpFrames = 0;
 const groundHeight = 100;
 
 const platforms = [
-  { x: 200, y: 0, w: 120, h: 20 },
-  { x: 450, y: 0, w: 120, h: 20 },
-  { x: 700, y: 0, w: 120, h: 20 },
-  { x: 950, y: 0, w: 120, h: 20 }
+  { x: 300, y: 0, w: 140, h: 20 },
+  { x: 600, y: 0, w: 140, h: 20 },
+  { x: 900, y: 0, w: 140, h: 20 },
+  { x: 1200, y: 0, w: 140, h: 20 }
 ];
 
 // ===== UPDATE =====
 function update() {
-  // движение
+  // горизонталь
   if (keys.left)  player.x -= speed;
   if (keys.right) player.x += speed;
 
@@ -87,7 +87,6 @@ function update() {
     jumpFrames++;
   }
 
-  // если кнопку отпустил — перестаём тянуть
   if (!keys.jump) {
     isJumping = false;
   }
@@ -96,8 +95,11 @@ function update() {
   player.vy += gravity;
   player.y += player.vy;
 
-  // земля
+  // считаем землю
   const groundY = canvas.height - groundHeight;
+  player.onGround = false;
+
+  // столкновение с землёй
   if (player.y + player.h >= groundY) {
     player.y = groundY - player.h;
     player.vy = 0;
@@ -105,10 +107,9 @@ function update() {
     isJumping = false;
   }
 
-  // платформы (позиции обновляются относительно экрана)
-  player.onGround = false;
-  platforms.forEach(p => {
-    p.y = groundY - 120 - (platforms.indexOf(p) % 2) * 80;
+  // платформы (фиксированные в мире)
+  platforms.forEach((p, i) => {
+    p.y = groundY - 150 - (i % 2) * 100;
 
     if (
       player.x < p.x + p.w &&
@@ -128,13 +129,18 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // ===== CAMERA =====
+  const camX = player.x - canvas.width / 2 + player.w / 2;
+  ctx.save();
+  ctx.translate(-camX, 0);
+
   // фон
   ctx.fillStyle = "#111";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(camX, 0, canvas.width, canvas.height);
 
   // земля
   ctx.fillStyle = "#555";
-  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+  ctx.fillRect(camX, canvas.height - groundHeight, 3000, groundHeight);
 
   // платформы
   ctx.fillStyle = "#777";
@@ -145,6 +151,8 @@ function draw() {
   // игрок
   ctx.fillStyle = "lime";
   ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  ctx.restore();
 }
 
 // ===== LOOP =====
