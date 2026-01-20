@@ -1,4 +1,4 @@
-// === CANVAS ===
+// ===== CANVAS =====
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -9,20 +9,20 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
-// === INPUT ===
+// ===== INPUT =====
 const keys = { left: false, right: false, jump: false };
 
-// тач
-document.getElementById("left").ontouchstart = () => keys.left = true;
-document.getElementById("left").ontouchend = () => keys.left = false;
+// кнопки (телефон)
+left.ontouchstart = () => keys.left = true;
+left.ontouchend   = () => keys.left = false;
 
-document.getElementById("right").ontouchstart = () => keys.right = true;
-document.getElementById("right").ontouchend = () => keys.right = false;
+right.ontouchstart = () => keys.right = true;
+right.ontouchend   = () => keys.right = false;
 
-document.getElementById("jump").ontouchstart = () => keys.jump = true;
-document.getElementById("jump").ontouchend = () => keys.jump = false;
+jump.ontouchstart = () => keys.jump = true;
+jump.ontouchend   = () => keys.jump = false;
 
-// клавиатура
+// клавиатура (ПК)
 window.addEventListener("keydown", e => {
   if (e.key === "a" || e.key === "ArrowLeft") keys.left = true;
   if (e.key === "d" || e.key === "ArrowRight") keys.right = true;
@@ -35,7 +35,7 @@ window.addEventListener("keyup", e => {
   if (e.key === " " || e.key === "ArrowUp") keys.jump = false;
 });
 
-// === PLAYER ===
+// ===== PLAYER =====
 const player = {
   x: 100,
   y: 100,
@@ -45,31 +45,25 @@ const player = {
   onGround: false
 };
 
-// === PHYSICS ===
+// ===== PHYSICS =====
 const gravity = 1;
 const jumpPower = -18;
 const speed = 6;
-
-// === GROUND ===
 const groundHeight = 100;
 
-// === UPDATE ===
+// ===== UPDATE =====
 function update() {
-  // движение
-  if (keys.left) player.x -= speed;
+  if (keys.left)  player.x -= speed;
   if (keys.right) player.x += speed;
 
-  // прыжок
   if (keys.jump && player.onGround) {
     player.vy = jumpPower;
     player.onGround = false;
   }
 
-  // гравитация
   player.vy += gravity;
   player.y += player.vy;
 
-  // земля
   const groundY = canvas.height - groundHeight;
   if (player.y + player.h >= groundY) {
     player.y = groundY - player.h;
@@ -78,7 +72,7 @@ function update() {
   }
 }
 
-// === DRAW ===
+// ===== DRAW =====
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -95,7 +89,7 @@ function draw() {
   ctx.fillRect(player.x, player.y, player.w, player.h);
 }
 
-// === LOOP ===
+// ===== LOOP =====
 function loop() {
   update();
   draw();
