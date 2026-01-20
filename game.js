@@ -158,3 +158,4 @@ function loop() {
 }
 
 loop();
+<script src="game.js"></script>
