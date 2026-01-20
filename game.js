@@ -66,13 +66,24 @@ function update() {
   if (keys.left)  player.x -= speed;
   if (keys.right) player.x += speed;
 
-  if (keys.jump && player.onGround) {
-    player.vy = jumpPower;
-    player.onGround = false;
-  }
+  // старт прыжка
+if (keys.jump && player.onGround) {
+  player.vy = jumpPower;
+  player.onGround = false;
+  isJumping = true;
+  jumpFrames = 0;
+}
 
-  player.vy += gravity;
-  player.y += player.vy;
+// удержание прыжка
+if (keys.jump && isJumping && jumpFrames < MAX_JUMP_FRAMES) {
+  player.vy += EXTRA_JUMP_FORCE;
+  jumpFrames++;
+}
+
+// если отпустил кнопку — прекращаем тянуть вверх
+if (!keys.jump) {
+  isJumping = false;
+}
 
   const groundY = canvas.height - groundHeight;
   if (player.y + player.h >= groundY) {
