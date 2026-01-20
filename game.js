@@ -26,7 +26,12 @@ const player = {
 };
 
 const gravity = 0.8;
+const JUMP_FORCE = -15;
+const EXTRA_JUMP_FORCE = -0.6;
+const MAX_JUMP_TIME = 15;
 
+let jumpTime = 0;
+let isJumping = false;
 const platforms = [
   { x: 0, y: canvas.height - 80, w: 3000, h: 80 },
   { x: 300, y: canvas.height - 200, w: 150, h: 20 },
