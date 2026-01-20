@@ -69,11 +69,11 @@ const platforms = [
 
 // ===== UPDATE =====
 function update() {
-  // горизонталь
+  // движение
   if (keys.left)  player.x -= speed;
   if (keys.right) player.x += speed;
 
-  // старт прыжка
+  // прыжок
   if (keys.jump && player.onGround) {
     player.vy = JUMP_POWER;
     player.onGround = false;
@@ -81,7 +81,7 @@ function update() {
     jumpFrames = 0;
   }
 
-  // удержание прыжка
+  // затяжной прыжок
   if (keys.jump && isJumping && jumpFrames < MAX_JUMP_FRAMES) {
     player.vy += EXTRA_JUMP_FORCE;
     jumpFrames++;
@@ -95,11 +95,12 @@ function update() {
   player.vy += gravity;
   player.y += player.vy;
 
-  // считаем землю
-  const groundY = canvas.height - groundHeight;
+  // === считаем, что в воздухе ===
   player.onGround = false;
 
-  // столкновение с землёй
+  const groundY = canvas.height - groundHeight;
+
+  // === ЗЕМЛЯ ===
   if (player.y + player.h >= groundY) {
     player.y = groundY - player.h;
     player.vy = 0;
@@ -107,7 +108,7 @@ function update() {
     isJumping = false;
   }
 
-  // платформы (фиксированные в мире)
+  // === ПЛАТФОРМЫ ===
   platforms.forEach((p, i) => {
     p.y = groundY - 150 - (i % 2) * 100;
 
