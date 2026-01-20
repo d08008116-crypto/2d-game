@@ -2,27 +2,21 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 // ===== INPUT =====
 const keys = { left: false, right: false, jump: false };
 
-// тач
 left.ontouchstart = () => keys.left = true;
-left.ontouchend   = () => keys.left = false;
+left.ontouchend = () => keys.left = false;
 
 right.ontouchstart = () => keys.right = true;
-right.ontouchend   = () => keys.right = false;
+right.ontouchend = () => keys.right = false;
 
 jump.ontouchstart = () => keys.jump = true;
-jump.ontouchend   = () => keys.jump = false;
+jump.ontouchend = () => keys.jump = false;
 
-// клавиатура
 window.addEventListener("keydown", e => {
   if (e.key === "a" || e.key === "ArrowLeft") keys.left = true;
   if (e.key === "d" || e.key === "ArrowRight") keys.right = true;
@@ -38,7 +32,7 @@ window.addEventListener("keyup", e => {
 // ===== PLAYER =====
 const player = {
   x: 100,
-  y: 0,
+  y: 100,
   w: 40,
   h: 40,
   vy: 0,
@@ -47,71 +41,45 @@ const player = {
 
 // ===== PHYSICS =====
 const gravity = 1;
+const jumpPower = -18;
 const speed = 6;
 
-// затяжной прыжок
-const JUMP_POWER = -18;
-const EXTRA_JUMP_FORCE = -0.7;
-const MAX_JUMP_FRAMES = 14;
-
-let isJumping = false;
-let jumpFrames = 0;
-
 // ===== LEVEL =====
-const groundHeight = 100;
+const groundY = canvas.height - 100;
 
 const platforms = [
-  { x: 300, y: 0, w: 140, h: 20 },
-  { x: 600, y: 0, w: 140, h: 20 },
-  { x: 900, y: 0, w: 140, h: 20 },
-  { x: 1200, y: 0, w: 140, h: 20 }
+  { x: 300, y: groundY - 150, w: 140, h: 20 },
+  { x: 600, y: groundY - 250, w: 140, h: 20 }
 ];
 
 // ===== UPDATE =====
 function update() {
   // движение
-  if (keys.left)  player.x -= speed;
+  if (keys.left) player.x -= speed;
   if (keys.right) player.x += speed;
 
   // прыжок
   if (keys.jump && player.onGround) {
-    player.vy = JUMP_POWER;
+    player.vy = jumpPower;
     player.onGround = false;
-    isJumping = true;
-    jumpFrames = 0;
-  }
-
-  // затяжной прыжок
-  if (keys.jump && isJumping && jumpFrames < MAX_JUMP_FRAMES) {
-    player.vy += EXTRA_JUMP_FORCE;
-    jumpFrames++;
-  }
-
-  if (!keys.jump) {
-    isJumping = false;
   }
 
   // гравитация
   player.vy += gravity;
   player.y += player.vy;
 
-  // === считаем, что в воздухе ===
+  // считаем, что в воздухе
   player.onGround = false;
 
-  const groundY = canvas.height - groundHeight;
-
-  // === ЗЕМЛЯ ===
+  // земля
   if (player.y + player.h >= groundY) {
     player.y = groundY - player.h;
     player.vy = 0;
     player.onGround = true;
-    isJumping = false;
   }
 
-  // === ПЛАТФОРМЫ ===
-  platforms.forEach((p, i) => {
-    p.y = groundY - 150 - (i % 2) * 100;
-
+  // платформы
+  for (let p of platforms) {
     if (
       player.x < p.x + p.w &&
       player.x + player.w > p.x &&
@@ -121,27 +89,21 @@ function update() {
       player.y = p.y - player.h;
       player.vy = 0;
       player.onGround = true;
-      isJumping = false;
     }
-  });
+  }
 }
 
 // ===== DRAW =====
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // ===== CAMERA =====
-  const camX = player.x - canvas.width / 2 + player.w / 2;
-  ctx.save();
-  ctx.translate(-camX, 0);
-
   // фон
   ctx.fillStyle = "#111";
-  ctx.fillRect(camX, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // земля
   ctx.fillStyle = "#555";
-  ctx.fillRect(camX, canvas.height - groundHeight, 3000, groundHeight);
+  ctx.fillRect(0, groundY, canvas.width, 100);
 
   // платформы
   ctx.fillStyle = "#777";
@@ -152,8 +114,6 @@ function draw() {
   // игрок
   ctx.fillStyle = "lime";
   ctx.fillRect(player.x, player.y, player.w, player.h);
-
-  ctx.restore();
 }
 
 // ===== LOOP =====
