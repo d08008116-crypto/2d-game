@@ -90,6 +90,7 @@ if (!keys.jump) {
     player.y = groundY - player.h;
     player.vy = 0;
     player.onGround = true;
+    isJumping = false;
   }
 }
 
