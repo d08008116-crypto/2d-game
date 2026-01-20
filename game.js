@@ -54,6 +54,13 @@ const jumpPower = -18;
 const speed = 6;
 const groundHeight = 100;
 
+// затяжной прыжок
+const EXTRA_JUMP_FORCE = -0.8; // сила удержания
+const MAX_JUMP_FRAMES = 12;    // сколько кадров можно тянуть прыжок
+
+let jumpFrames = 0;
+let isJumping = false;
+
 // ===== UPDATE =====
 function update() {
   if (keys.left)  player.x -= speed;
