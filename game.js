@@ -41,26 +41,58 @@ const platforms = [
   { x: 1500, y: canvas.height - 220, w: 150, h: 20 }
 ];
 
-function update(// начало прыжка
-if (keys.jump && player.onGround) {
-  player.vy = JUMP_FORCE;
-  player.onGround = false;
-  isJumping = true;
-  jumpTime = 0;
-}
+function update() {
+  // движение влево / вправо
+  if (keys.left) player.x -= 5;
+  if (keys.right) player.x += 5;
 
-// затяжной прыжок (пока держишь кнопку)
-if (keys.jump && isJumping) {
-  if (jumpTime < MAX_JUMP_TIME) {
+  // начало прыжка
+  if (keys.jump && player.onGround) {
+    player.vy = JUMP_FORCE;
+    player.onGround = false;
+    isJumping = true;
+    jumpTime = 0;
+  }
+
+  // затяжной прыжок
+  if (keys.jump && isJumping && jumpTime < MAX_JUMP_TIME) {
     player.vy += EXTRA_JUMP_FORCE;
     jumpTime++;
   }
-}
 
-// если кнопку отпустил — прыжок обрывается
-if (!keys.jump) {
-  isJumping = false;
-}) {
+  // если отпустил кнопку — обрываем прыжок
+  if (!keys.jump) {
+    isJumping = false;
+  }
+
+  // гравитация
+  player.vy += gravity;
+  player.y += player.vy;
+
+  // столкновения с платформами
+  player.onGround = false;
+  for (let p of platforms) {
+    if (
+      player.x < p.x + p.w &&
+      player.x + player.w > p.x &&
+      player.y + player.h < p.y + p.h &&
+      player.y + player.h + player.vy >= p.y
+    ) {
+      player.y = p.y - player.h;
+      player.vy = 0;
+      player.onGround = true;
+      isJumping = false;
+    }
+  }
+
+  // рестарт при падении
+  if (player.y > canvas.height + 500) {
+    player.x = 100;
+    player.y = 100;
+    player.vy = 0;
+    isJumping = false;
+  }
+}
   if (keys.left) player.x -= 5;
   if (keys.right) player.x += 5;
 
