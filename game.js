@@ -1,3 +1,6 @@
+alert("GAME JS LOADED");
+ctx.fillStyle = "red";
+ctx.fillRect(...)
 // ===== CANVAS =====
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
